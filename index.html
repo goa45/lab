@@ -5,517 +5,522 @@
   <title>⚙ Стімпанк Лабораторія — Фізика</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <style>
-    body { margin:0; background:#030100; overflow:hidden; }
+    body { margin:0; background:#100800; overflow:hidden; }
     #hint {
       position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
-      background:rgba(10,5,0,0.93); color:#c87d32;
+      background:rgba(15,8,0,0.92); color:#e09040;
       font-family:Georgia,serif; font-size:13px; letter-spacing:1px;
-      padding:7px 22px; border:1px solid #6a3a08; border-radius:2px;
+      padding:7px 22px; border:1px solid #8a5010; border-radius:2px;
       z-index:999; pointer-events:none;
     }
   </style>
 </head>
 <body>
-<div id="hint">⚙ Клікніть на панель або наведіть погляд (1.5 с) · WASD – рух · Миша – огляд</div>
+<div id="hint">⚙ Клікніть на панель класу · WASD – рух · Миша – огляд</div>
 
 <script>
-// ================================================================
-//  НАВЧАЛЬНИЙ ПЛАН
-// ================================================================
 const curriculum = {
-  7:{ col:'#6B2020', accent:'#e07070', themes:[
-    {name:'Фізика як наука',    lessons:['Вступ до фізики','Фізичні величини та одиниці','Вимірювальні прилади','🔬 Лаб: Вимірювання довжини та об\'єму']},
-    {name:'Механічний рух',     lessons:['Рівномірний рух','Графіки руху','Нерівномірний рух','🔬 Лаб: Середня швидкість тіла']},
-    {name:'Взаємодія тіл',      lessons:['Сила та маса','Сила тяжіння','Тертя','🔬 Лаб: Сила пружності']},
-    {name:'Тиск та Архімед',    lessons:['Тиск твердих тіл','Тиск рідин і газів','Атмосферний тиск','Сила Архімеда','🔬 Лаб: Сила Архімеда']},
+  7:{ col:'#7a2020', accent:'#ff9090', themes:[
+    {name:'Фізика як наука', lessons:[
+      {text:'Вступ до фізики'},{text:'Фізичні величини та одиниці'},
+      {text:'Вимірювальні прилади'},{text:'🔬 Лаб: Вимірювання довжини'},
+    ]},
+    {name:'Механічний рух', lessons:[
+      {text:'Рівномірний рух'},{text:'Графіки руху'},
+      {text:'Нерівномірний рух'},{text:'🔬 Лаб: Середня швидкість'},
+    ]},
+    {name:'Взаємодія тіл', lessons:[
+      {text:'Сила та маса'},{text:'Сила тяжіння'},
+      {text:'Тертя'},{text:'🔬 Лаб: Сила пружності'},
+    ]},
+    {name:'Тиск та Архімед', lessons:[
+      {text:'Тиск твердих тіл'},{text:'Тиск рідин і газів'},
+      {text:'Атмосферний тиск'},{text:'Сила Архімеда — теорія'},
+    ]},
+    {name:'Виштовхувальна сила', lessons:[
+      {text:'Умова плавання тіл'},
+      {text:'Плавання суден і повітроплавання'},
+      {text:'🔬 VR-лаб: Сила Архімеда', url:'https://goa45.github.io/arkhimed/'},
+    ]},
   ]},
-  8:{ col:'#1a3d6b', accent:'#6699ee', themes:[
-    {name:'Теплові явища',      lessons:['Внутрішня енергія','Теплопровідність','Конвекція. Випромінювання','🔬 Лаб: Питома теплоємність']},
-    {name:'Зміна стану речовини',lessons:['Плавлення і тверднення','Випаровування','Кипіння','🔬 Лаб: Температура кипіння']},
-    {name:'Електричний струм',  lessons:['Електричний заряд','Закон Ома','З\'єднання провідників','🔬 Лаб: Закон Ома']},
-    {name:'Електромагнетизм',   lessons:['Магнітне поле струму','Сила Ампера','Електродвигун','🔬 Лаб: Магнітне поле']},
+  8:{ col:'#1a3d6b', accent:'#88bbff', themes:[
+    {name:'Теплові явища', lessons:[
+      {text:'Внутрішня енергія'},{text:'Теплопровідність'},
+      {text:'Конвекція. Випромінювання'},{text:'🔬 Лаб: Питома теплоємність'},
+    ]},
+    {name:'Зміна стану речовини', lessons:[
+      {text:'Плавлення і тверднення'},{text:'Випаровування'},
+      {text:'Кипіння'},{text:'🔬 Лаб: Температура кипіння'},
+    ]},
+    {name:'Електричний струм', lessons:[
+      {text:'Електричний заряд'},{text:'Закон Ома'},
+      {text:'З\'єднання провідників'},{text:'🔬 Лаб: Закон Ома'},
+    ]},
+    {name:'Електромагнетизм', lessons:[
+      {text:'Магнітне поле струму'},{text:'Сила Ампера'},
+      {text:'Електродвигун'},{text:'🔬 Лаб: Магнітне поле'},
+    ]},
   ]},
-  9:{ col:'#1a4d2a', accent:'#55cc77', themes:[
-    {name:'Кінематика',          lessons:['Рівноприскорений рух','Вільне падіння','Рух по колу','🔬 Лаб: Прискорення при падінні']},
-    {name:'Динаміка',            lessons:['Перший закон Ньютона','Другий закон Ньютона','Третій закон Ньютона','🔬 Лаб: ІІ закон Ньютона']},
-    {name:'Коливання і хвилі',   lessons:['Гармонічні коливання','Математичний маятник','Звукові хвилі','🔬 Лаб: Математичний маятник']},
-    {name:'Електромагн. індукція',lessons:['Досліди Фарадея','ЕРС індукції','Правило Ленца','🔬 Лаб: Індукційний струм']},
+  9:{ col:'#1a4d2a', accent:'#66ee88', themes:[
+    {name:'Кінематика', lessons:[
+      {text:'Рівноприскорений рух'},{text:'Вільне падіння'},
+      {text:'Рух по колу'},{text:'🔬 Лаб: Прискорення при падінні'},
+    ]},
+    {name:'Динаміка', lessons:[
+      {text:'Перший закон Ньютона'},{text:'Другий закон Ньютона'},
+      {text:'Третій закон Ньютона'},{text:'🔬 Лаб: ІІ закон Ньютона'},
+    ]},
+    {name:'Коливання і хвилі', lessons:[
+      {text:'Гармонічні коливання'},{text:'Математичний маятник'},
+      {text:'Звукові хвилі'},{text:'🔬 Лаб: Математичний маятник'},
+    ]},
+    {name:'Електромагн. індукція', lessons:[
+      {text:'Досліди Фарадея'},{text:'ЕРС індукції'},
+      {text:'Правило Ленца'},{text:'🔬 Лаб: Індукційний струм'},
+    ]},
   ]},
-  10:{col:'#5a4010', accent:'#ddaa44', themes:[
-    {name:'Статика та гідростатика',lessons:['Умови рівноваги','Центр мас','Закон Паскаля (поглиблено)','🔬 Лаб: Умова рівноваги важеля']},
-    {name:'Молекулярна фізика',  lessons:['Ідеальний газ','Ізотерма. Ізобара. Ізохора','Рівняння стану газу','🔬 Лаб: Закон Бойля–Маріотта']},
-    {name:'Електростатика',      lessons:['Закон Кулона','Напруженість поля','Конденсатор','🔬 Лаб: Ємність конденсатора']},
-    {name:'Геометрична оптика',  lessons:['Відбиття і заломлення','Тонка лінза','Оптичні прилади','🔬 Лаб: Фокусна відстань лінзи']},
+  10:{col:'#5a4010', accent:'#ffcc55', themes:[
+    {name:'Статика та гідростатика', lessons:[
+      {text:'Умови рівноваги'},{text:'Центр мас'},
+      {text:'Закон Паскаля (поглиблено)'},{text:'🔬 Лаб: Рівновага важеля'},
+    ]},
+    {name:'Молекулярна фізика', lessons:[
+      {text:'Ідеальний газ'},{text:'Ізотерма. Ізобара. Ізохора'},
+      {text:'Рівняння стану газу'},{text:'🔬 Лаб: Закон Бойля–Маріотта'},
+    ]},
+    {name:'Електростатика', lessons:[
+      {text:'Закон Кулона'},{text:'Напруженість поля'},
+      {text:'Конденсатор'},{text:'🔬 Лаб: Ємність конденсатора'},
+    ]},
+    {name:'Геометрична оптика', lessons:[
+      {text:'Відбиття і заломлення'},{text:'Тонка лінза'},
+      {text:'Оптичні прилади'},{text:'🔬 Лаб: Фокусна відстань лінзи'},
+    ]},
   ]},
-  11:{col:'#3a1a6a', accent:'#aa77ee', themes:[
-    {name:'Змінний струм',       lessons:['Генератор змінного струму','Трансформатор','LC-контур. Резонанс','🔬 Лаб: Резонанс у LC-контурі']},
-    {name:'Хвильова оптика',     lessons:['Інтерференція','Дифракція','Дисперсія і поляризація','🔬 Лаб: Довжина хвилі лазера']},
-    {name:'Квантова фізика',     lessons:['Фотоефект','Корпускулярно-хвильовий дуалізм','Модель атома Бора','🔬 Лаб: Спектри атомів']},
-    {name:'Ядерна фізика',       lessons:['Будова ядра','Радіоактивний розпад','Ядерні реакції','🔬 Лаб: Радіаційний фон']},
+  11:{col:'#3a1a6a', accent:'#cc99ff', themes:[
+    {name:'Змінний струм', lessons:[
+      {text:'Генератор змінного струму'},{text:'Трансформатор'},
+      {text:'LC-контур. Резонанс'},{text:'🔬 Лаб: Резонанс у LC-контурі'},
+    ]},
+    {name:'Хвильова оптика', lessons:[
+      {text:'Інтерференція'},{text:'Дифракція'},
+      {text:'Дисперсія і поляризація'},{text:'🔬 Лаб: Довжина хвилі лазера'},
+    ]},
+    {name:'Квантова фізика', lessons:[
+      {text:'Фотоефект'},{text:'Корпускулярно-хвильовий дуалізм'},
+      {text:'Модель атома Бора'},{text:'🔬 Лаб: Спектри атомів'},
+    ]},
+    {name:'Ядерна фізика', lessons:[
+      {text:'Будова ядра'},{text:'Радіоактивний розпад'},
+      {text:'Ядерні реакції'},{text:'🔬 Лаб: Радіаційний фон'},
+    ]},
   ]},
 };
 
-// ================================================================
-//  СТАН
-// ================================================================
-let navState = {level:0, cls:null};
-
-// ================================================================
-//  УТИЛІТИ СТВОРЕННЯ ЕЛЕМЕНТІВ
-// ================================================================
 function el(tag,attrs){
   const e=document.createElement('a-'+tag);
-  for(const [k,v] of Object.entries(attrs||{})) e.setAttribute(k,v);
+  for(const [k,v] of Object.entries(attrs||{})) e.setAttribute(k,String(v));
   return e;
 }
-
 function brassFrame(w,h){
   const g=document.createElement('a-entity');
-  const m='color:#b87333; metalness:0.9; roughness:0.12';
-  const t=0.022;
-  [[`0 ${h/2+t/2} 0.01`,w+2*t,t],
-   [`0 ${-h/2-t/2} 0.01`,w+2*t,t],
-   [`${-w/2-t/2} 0 0.01`,t,h+2*t],
-   [`${w/2+t/2} 0 0.01`,t,h+2*t]].forEach(([pos,bw,bh])=>{
-    const b=el('box',{position:pos,width:bw,height:bh,depth:0.04,material:m});
-    g.appendChild(b);
+  const m='color:#d49040; metalness:0.92; roughness:0.1';
+  const t=0.024;
+  [[`0 ${h/2+t/2} 0.012`,w+2*t,t],[`0 ${-h/2-t/2} 0.012`,w+2*t,t],
+   [`${-w/2-t/2} 0 0.012`,t,h+2*t],[`${w/2+t/2} 0 0.012`,t,h+2*t]
+  ].forEach(([pos,bw,bh])=>{
+    g.appendChild(el('box',{position:pos,width:bw,height:bh,depth:0.045,material:m}));
   });
   return g;
 }
-
-function mkText(val,color,scale,align){
-  return el('text',{value:val,color:color||'#c87d32',scale:scale||'0.45 0.45 0.45',align:align||'center','wrap-count':24});
+function mkText(val,color,scale,align,wc){
+  return el('text',{value:val,color:color||'#e09040',scale:scale||'0.45 0.45 0.45',align:align||'center','wrap-count':wc||26});
 }
-
-// ================================================================
-//  НАВІГАЦІЯ
-// ================================================================
 function clearNav(){
   ['nav-0','nav-1','nav-2'].forEach(id=>{
     const n=document.getElementById(id);
-    n.innerHTML=''; n.setAttribute('visible',false);
+    if(n){n.innerHTML='';n.setAttribute('visible','false');}
   });
 }
 
 function showLevel0(){
-  clearNav(); navState={level:0,cls:null};
+  clearNav();
   const c=document.getElementById('nav-0');
-  c.setAttribute('visible',true);
-
-  // Заголовок над столом
-  const titleGroup=document.createElement('a-entity');
-  titleGroup.setAttribute('position','0 2.05 0.4');
-  const titleBg=el('plane',{width:2.5,height:0.22,material:'color:#080400; opacity:0.9; transparent:true; side:double'});
-  titleGroup.appendChild(titleBg);
-  titleGroup.appendChild(brassFrame(2.5,0.22));
-  const titleTxt=mkText('⚙  ОБЕРІТЬ КЛАС  ⚙','#c87d32','0.48 0.48 0.48');
-  titleTxt.setAttribute('position','0 0 0.02');
-  titleGroup.appendChild(titleTxt);
-  c.appendChild(titleGroup);
+  c.setAttribute('visible','true');
+  // Заголовок
+  const tg=document.createElement('a-entity');
+  tg.setAttribute('position','0 2.14 0.3');
+  const tbg=el('plane',{width:2.7,height:0.28,material:'color:#120800; opacity:0.95; transparent:true; side:double'});
+  tg.appendChild(tbg); tg.appendChild(brassFrame(2.7,0.28));
+  const ttx=mkText('⚙   ОБЕРІТЬ КЛАС   ⚙','#ffcc66','0.54 0.54 0.54');
+  ttx.setAttribute('position','0 0 0.02'); tg.appendChild(ttx);
+  c.appendChild(tg);
 
   [7,8,9,10,11].forEach((cls,i)=>{
-    const x=(i-2)*0.62;
+    const x=(i-2)*0.68;
     const panel=document.createElement('a-entity');
-    panel.setAttribute('position',`${x} 1.55 0.4`);
-    panel.classList.add('clickable');
-
-    const bg=el('plane',{width:0.52,height:0.68,material:`color:${curriculum[cls].col}; opacity:0.92; transparent:true; side:double`});
+    panel.setAttribute('position',`${x} 1.53 0.3`);
+    panel.setAttribute('class','clickable');
+    const {col,accent}=curriculum[cls];
+    const bg=el('plane',{width:0.58,height:0.76,material:`color:${col}; opacity:0.96; transparent:true; side:double`});
     panel.appendChild(bg);
-    panel.appendChild(brassFrame(0.52,0.68));
-
-    const lbl=mkText(`${cls}\nклас`,curriculum[cls].accent,'0.52 0.52 0.52');
-    lbl.setAttribute('position','0 0.1 0.02');
-    panel.appendChild(lbl);
-
-    // Маленька шестерня-іконка
-    const gearRing=el('torus',{radius:0.1,radiusTubular:0.022,'segments-radial':8,'segments-tubular':8,position:'0 -0.2 0.03',material:'color:#b87333; metalness:0.9; roughness:0.1'});
-    gearRing.setAttribute('animation',`property:rotation; to:0 0 360; dur:${3000+i*400}; loop:true; easing:linear`);
-    panel.appendChild(gearRing);
-    const gearHub=el('cylinder',{radius:0.035,height:0.05,position:'0 -0.2 0.03',material:'color:#c87d32; metalness:0.95'});
-    panel.appendChild(gearHub);
+    panel.appendChild(brassFrame(0.58,0.76));
+    // Велике число
+    const num=mkText(`${cls}`,'#ffffff','1.1 1.1 1.1');
+    num.setAttribute('position','0 0.14 0.03');
+    panel.appendChild(num);
+    // Підпис
+    const sub=mkText('клас',accent,'0.43 0.43 0.43');
+    sub.setAttribute('position','0 -0.09 0.03');
+    panel.appendChild(sub);
+    // Шестерня
+    const gr=el('torus',{radius:0.09,position:`0 -0.28 0.04`,material:`color:#d49040; metalness:0.92; roughness:0.1`});
+    gr.setAttribute('segments-radial','8'); gr.setAttribute('segments-tubular','8');
+    gr.setAttribute('animation',`property:rotation; to:0 0 360; dur:${2600+i*320}; loop:true; easing:linear`);
+    panel.appendChild(gr);
+    panel.appendChild(el('cylinder',{radius:0.03,height:0.06,position:`0 -0.28 0.04`,material:'color:#ffcc44; metalness:0.95'}));
 
     panel.addEventListener('click',()=>showLevel1(cls));
-    panel.addEventListener('mouseenter',()=>bg.setAttribute('material',`color:${curriculum[cls].accent}; opacity:0.25; transparent:true; side:double`));
-    panel.addEventListener('mouseleave',()=>bg.setAttribute('material',`color:${curriculum[cls].col}; opacity:0.92; transparent:true; side:double`));
+    panel.addEventListener('mouseenter',()=>bg.setAttribute('material',`color:${accent}; opacity:0.28; transparent:true; side:double`));
+    panel.addEventListener('mouseleave',()=>bg.setAttribute('material',`color:${col}; opacity:0.96; transparent:true; side:double`));
     c.appendChild(panel);
   });
 }
 
 function showLevel1(cls){
-  clearNav(); navState={level:1,cls};
+  clearNav();
   const c=document.getElementById('nav-1');
-  c.setAttribute('visible',true);
+  c.setAttribute('visible','true');
   const {col,accent,themes}=curriculum[cls];
-
   // Заголовок
   const tg=document.createElement('a-entity');
-  tg.setAttribute('position','0 2.08 0.6');
-  const tbg=el('plane',{width:2.6,height:0.22,material:'color:#080400; opacity:0.92; transparent:true; side:double'});
-  tg.appendChild(tbg); tg.appendChild(brassFrame(2.6,0.22));
-  const ttx=mkText(`⚙  ${cls} КЛАС — ТЕМИ  ⚙`,accent,'0.48 0.48 0.48');
+  tg.setAttribute('position','0 2.16 0.5');
+  const tbg=el('plane',{width:2.8,height:0.28,material:'color:#120800; opacity:0.95; transparent:true; side:double'});
+  tg.appendChild(tbg); tg.appendChild(brassFrame(2.8,0.28));
+  const ttx=mkText(`⚙  ${cls} КЛАС — ТЕМИ  ⚙`,accent,'0.5 0.5 0.5');
   ttx.setAttribute('position','0 0 0.02'); tg.appendChild(ttx);
   c.appendChild(tg);
 
+  // Позиції тем
+  const positions=[];
+  if(themes.length<=4){
+    themes.forEach((_,i)=>positions.push({x:i%2===0?-0.78:0.78,y:i<2?1.8:1.26}));
+  } else {
+    [0,1,2].forEach(i=>positions.push({x:(i-1)*1.12,y:1.8}));
+    [3,4].forEach(i=>positions.push({x:(i-3)*1.55-0.78,y:1.22}));
+  }
   themes.forEach((theme,i)=>{
-    const x = i%2===0 ? -0.72 : 0.72;
-    const y = i<2 ? 1.76 : 1.24;
+    const {x,y}=positions[i];
     const panel=document.createElement('a-entity');
-    panel.setAttribute('position',`${x} ${y} 0.6`);
-    panel.classList.add('clickable');
-
-    const bg=el('plane',{width:1.28,height:0.42,material:'color:#090500; opacity:0.93; transparent:true; side:double'});
-    panel.appendChild(bg); panel.appendChild(brassFrame(1.28,0.42));
-
-    const nt=mkText(theme.name,accent,'0.38 0.38 0.38');
-    nt.setAttribute('position','0 0.07 0.02'); panel.appendChild(nt);
-    const ct=mkText(`${theme.lessons.length} занять · → натисніть`,'#776655','0.3 0.3 0.3');
+    panel.setAttribute('position',`${x} ${y} 0.5`);
+    panel.setAttribute('class','clickable');
+    const bg=el('plane',{width:1.34,height:0.46,material:'color:#140900; opacity:0.95; transparent:true; side:double'});
+    panel.appendChild(bg); panel.appendChild(brassFrame(1.34,0.46));
+    const nt=mkText(theme.name,accent,'0.4 0.4 0.4');
+    nt.setAttribute('position','0 0.1 0.02'); panel.appendChild(nt);
+    const hasLink=theme.lessons.some(l=>l.url);
+    const hint=hasLink?`${theme.lessons.length} занять · є VR-лаб →`:`${theme.lessons.length} занять · →`;
+    const ct=mkText(hint,'#998866','0.31 0.31 0.31');
     ct.setAttribute('position','0 -0.1 0.02'); panel.appendChild(ct);
-
     panel.addEventListener('click',()=>showLevel2(cls,i));
-    panel.addEventListener('mouseenter',()=>bg.setAttribute('material',`color:${col}; opacity:0.6; transparent:true; side:double`));
-    panel.addEventListener('mouseleave',()=>bg.setAttribute('material','color:#090500; opacity:0.93; transparent:true; side:double'));
+    panel.addEventListener('mouseenter',()=>bg.setAttribute('material',`color:${col}; opacity:0.65; transparent:true; side:double`));
+    panel.addEventListener('mouseleave',()=>bg.setAttribute('material','color:#140900; opacity:0.95; transparent:true; side:double'));
     c.appendChild(panel);
   });
-
   addBack(c,()=>showLevel0());
 }
 
 function showLevel2(cls,ti){
-  clearNav(); navState={level:2,cls};
+  clearNav();
   const c=document.getElementById('nav-2');
-  c.setAttribute('visible',true);
+  c.setAttribute('visible','true');
   const {accent,themes}=curriculum[cls];
   const theme=themes[ti];
-  const panH=0.28+theme.lessons.length*0.185;
-
+  const panH=0.32+theme.lessons.length*0.2;
   const mp=document.createElement('a-entity');
-  mp.setAttribute('position',`0 ${1.08+panH/2} 0.6`);
-
-  const bg=el('plane',{width:2.1,height:panH+0.35,material:'color:#060300; opacity:0.95; transparent:true; side:double'});
-  mp.appendChild(bg); mp.appendChild(brassFrame(2.1,panH+0.35));
-
-  const th=mkText(`${cls} клас  ·  ${theme.name}`,accent,'0.4 0.4 0.4');
-  th.setAttribute('position',`0 ${panH/2+0.04} 0.02`); mp.appendChild(th);
-
-  const div=el('box',{width:1.9,height:0.005,depth:0.01,position:`0 ${panH/2-0.16} 0.02`,material:'color:#b87333; metalness:0.8'});
-  mp.appendChild(div);
+  mp.setAttribute('position',`0 ${1.05+panH/2} 0.5`);
+  const bg=el('plane',{width:2.35,height:panH+0.42,material:'color:#0c0600; opacity:0.97; transparent:true; side:double'});
+  mp.appendChild(bg); mp.appendChild(brassFrame(2.35,panH+0.42));
+  const th=mkText(`${cls} клас  ·  ${theme.name}`,accent,'0.43 0.43 0.43');
+  th.setAttribute('position',`0 ${panH/2+0.07} 0.02`); mp.appendChild(th);
+  const divBar=el('box',{width:2.15,height:0.006,depth:0.012,position:`0 ${panH/2-0.17} 0.02`,material:'color:#d49040; metalness:0.85'});
+  mp.appendChild(divBar);
 
   theme.lessons.forEach((lesson,i)=>{
-    const y=panH/2-0.28-i*0.185;
-    const isLab=lesson.startsWith('🔬');
-    const dot=el('sphere',{radius:0.022,position:`-0.94 ${y+0.02} 0.03`,material:`color:${isLab?'#55cc55':'#b87333'}; metalness:0.8`});
+    const y=panH/2-0.31-i*0.2;
+    const isLab=lesson.text.startsWith('🔬');
+    const hasUrl=!!lesson.url;
+    const dot=el('sphere',{radius:0.025,position:`-1.04 ${y+0.024} 0.03`,
+      material:`color:${hasUrl?'#44ffaa':isLab?'#55dd55':'#d49040'}; metalness:0.8${hasUrl?'; emissive:#22aa66; emissiveIntensity:0.7':''}`});
     mp.appendChild(dot);
-    const lt=mkText(lesson,isLab?'#77dd77':'#ccaa66','0.35 0.35 0.35','left');
-    lt.setAttribute('position',`-0.88 ${y} 0.02`); mp.appendChild(lt);
-  });
 
+    if(hasUrl){
+      const row=document.createElement('a-entity');
+      row.setAttribute('position',`-0.98 ${y} 0.02`);
+      row.setAttribute('class','clickable');
+      const rowBg=el('plane',{width:2.0,height:0.17,material:'color:#003a22; opacity:0.75; transparent:true; side:double'});
+      row.appendChild(rowBg);
+      const lt=mkText(lesson.text+'  ↗','#55ffaa','0.37 0.37 0.37','left',34);
+      lt.setAttribute('position','0 0 0.01'); row.appendChild(lt);
+      row.addEventListener('click',()=>window.open(lesson.url,'_blank'));
+      row.addEventListener('mouseenter',()=>rowBg.setAttribute('material','color:#005533; opacity:0.92; transparent:true; side:double'));
+      row.addEventListener('mouseleave',()=>rowBg.setAttribute('material','color:#003a22; opacity:0.75; transparent:true; side:double'));
+      mp.appendChild(row);
+    } else {
+      const lt=mkText(lesson.text,isLab?'#88ee88':'#ddbb77','0.37 0.37 0.37','left',36);
+      lt.setAttribute('position',`-0.98 ${y} 0.02`); mp.appendChild(lt);
+    }
+  });
   c.appendChild(mp);
   addBack(c,()=>showLevel1(cls));
 }
 
 function addBack(container,cb){
   const btn=document.createElement('a-entity');
-  btn.setAttribute('position','-1.5 1.06 0.6');
-  btn.classList.add('clickable');
-  const bg=el('plane',{width:0.55,height:0.22,material:'color:#150800; opacity:0.93; transparent:true; side:double'});
-  btn.appendChild(bg); btn.appendChild(brassFrame(0.55,0.22));
-  const t=mkText('← Назад','#c87d32','0.38 0.38 0.38');
+  btn.setAttribute('position','-1.65 1.05 0.5');
+  btn.setAttribute('class','clickable');
+  const bg=el('plane',{width:0.62,height:0.26,material:'color:#200c00; opacity:0.95; transparent:true; side:double'});
+  btn.appendChild(bg); btn.appendChild(brassFrame(0.62,0.26));
+  const t=mkText('← Назад','#e09040','0.41 0.41 0.41');
   t.setAttribute('position','0 0 0.02'); btn.appendChild(t);
   btn.addEventListener('click',cb);
-  btn.addEventListener('mouseenter',()=>bg.setAttribute('material','color:#3a1500; opacity:0.95; transparent:true; side:double'));
-  btn.addEventListener('mouseleave',()=>bg.setAttribute('material','color:#150800; opacity:0.93; transparent:true; side:double'));
+  btn.addEventListener('mouseenter',()=>bg.setAttribute('material','color:#4a1800; opacity:0.97; transparent:true; side:double'));
+  btn.addEventListener('mouseleave',()=>bg.setAttribute('material','color:#200c00; opacity:0.95; transparent:true; side:double'));
   container.appendChild(btn);
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelector('a-scene').addEventListener('loaded',()=>setTimeout(showLevel0,600));
+  document.querySelector('a-scene').addEventListener('loaded',()=>setTimeout(showLevel0,500));
 });
 </script>
 
-<!-- ============================================================ -->
-<a-scene fog="type:exponential; color:#050200; density:0.06">
-
-  <a-sky color="#020100"></a-sky>
+<a-scene fog="type:exponential; color:#100800; density:0.04">
+  <a-sky color="#070300"></a-sky>
 
   <!-- ПІДЛОГА -->
-  <a-plane position="0 0 0" rotation="-90 0 0" width="12" height="12"
-    material="color:#180b03; roughness:0.97"></a-plane>
-  <!-- Дошки підлоги -->
-  <a-entity>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002 -2.6" material="color:#231008; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002 -2.0" material="color:#1c0c06; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002 -1.4" material="color:#231008; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002 -0.8" material="color:#1c0c06; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002 -0.2" material="color:#231008; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002  0.4" material="color:#1c0c06; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002  1.0" material="color:#231008; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002  1.6" material="color:#1c0c06; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002  2.2" material="color:#231008; roughness:1"></a-box>
-    <a-box width="12" height="0.004" depth="0.13" position="0 0.002  2.8" material="color:#1c0c06; roughness:1"></a-box>
-  </a-entity>
+  <a-plane position="0 0 0" rotation="-90 0 0" width="14" height="14" material="color:#2a1208; roughness:0.92"></a-plane>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003 -2.4" material="color:#361a0a; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003 -1.8" material="color:#281404; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003 -1.2" material="color:#361a0a; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003 -0.6" material="color:#281404; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003  0"   material="color:#361a0a; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003  0.6" material="color:#281404; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003  1.2" material="color:#361a0a; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003  1.8" material="color:#281404; roughness:1"></a-box>
+  <a-box width="14" height="0.005" depth="0.16" position="0 0.003  2.4" material="color:#361a0a; roughness:1"></a-box>
 
   <!-- СТІНИ -->
-  <a-box position="0 2.1 -5.1" width="12" height="4.2" depth="0.14" material="color:#160a02; roughness:0.98"></a-box>
-  <a-box position="-5.1 2.1 0" width="0.14" height="4.2" depth="12" material="color:#140902; roughness:0.98"></a-box>
-  <a-box position="5.1 2.1 0" width="0.14" height="4.2" depth="12" material="color:#140902; roughness:0.98"></a-box>
-  <!-- Горизонтальний плінтус -->
-  <a-box position="0 0.07 -5.04" width="12" height="0.14" depth="0.1" material="color:#8B6914; metalness:0.6; roughness:0.4"></a-box>
-  <a-box position="-5.04 0.07 0" width="0.1" height="0.14" depth="12" material="color:#8B6914; metalness:0.6; roughness:0.4"></a-box>
-  <a-box position="5.04 0.07 0" width="0.1" height="0.14" depth="12" material="color:#8B6914; metalness:0.6; roughness:0.4"></a-box>
-  <!-- Карниз стелі -->
-  <a-box position="0 4.07 -5.04" width="12" height="0.14" depth="0.1" material="color:#5a3d0a; metalness:0.7; roughness:0.3"></a-box>
-  <a-box position="-5.04 4.07 0" width="0.1" height="0.14" depth="12" material="color:#5a3d0a; metalness:0.7; roughness:0.3"></a-box>
-  <a-box position="5.04 4.07 0" width="0.1" height="0.14" depth="12" material="color:#5a3d0a; metalness:0.7; roughness:0.3"></a-box>
+  <a-box position="0 2.1 -5.2" width="14" height="4.2" depth="0.15" material="color:#321808; roughness:0.95"></a-box>
+  <a-box position="-5.2 2.1 0" width="0.15" height="4.2" depth="14" material="color:#281408; roughness:0.95"></a-box>
+  <a-box position="5.2 2.1 0"  width="0.15" height="4.2" depth="14" material="color:#281408; roughness:0.95"></a-box>
+  <!-- Плінтуси -->
+  <a-box position="0 0.08 -5.12"  width="14" height="0.16" depth="0.12" material="color:#a86e22; metalness:0.55; roughness:0.42"></a-box>
+  <a-box position="-5.12 0.08 0"  width="0.12" height="0.16" depth="14" material="color:#a86e22; metalness:0.55; roughness:0.42"></a-box>
+  <a-box position="5.12 0.08 0"   width="0.12" height="0.16" depth="14" material="color:#a86e22; metalness:0.55; roughness:0.42"></a-box>
+  <!-- Карнизи -->
+  <a-box position="0 4.08 -5.12"  width="14" height="0.16" depth="0.12" material="color:#6e4814; metalness:0.65; roughness:0.32"></a-box>
+  <a-box position="-5.12 4.08 0"  width="0.12" height="0.16" depth="14" material="color:#6e4814; metalness:0.65; roughness:0.32"></a-box>
+  <a-box position="5.12 4.08 0"   width="0.12" height="0.16" depth="14" material="color:#6e4814; metalness:0.65; roughness:0.32"></a-box>
 
   <!-- СТЕЛЯ -->
-  <a-box position="0 4.15 0" width="12" height="0.16" depth="12" material="color:#0e0c06; roughness:0.7; metalness:0.45"></a-box>
-  <!-- Балки -->
-  <a-box position="0 3.95 -3"   width="12" height="0.14" depth="0.2" material="color:#1c1608; roughness:0.75; metalness:0.4"></a-box>
-  <a-box position="0 3.95 -0.5" width="12" height="0.14" depth="0.2" material="color:#1c1608; roughness:0.75; metalness:0.4"></a-box>
-  <a-box position="0 3.95  2"   width="12" height="0.14" depth="0.2" material="color:#1c1608; roughness:0.75; metalness:0.4"></a-box>
+  <a-box position="0 4.2 0" width="14" height="0.18" depth="14" material="color:#1e1408; roughness:0.7; metalness:0.3"></a-box>
+  <a-box position="0 4.0 -3"   width="14" height="0.15" depth="0.22" material="color:#281808; roughness:0.7; metalness:0.35"></a-box>
+  <a-box position="0 4.0 -0.5" width="14" height="0.15" depth="0.22" material="color:#281808; roughness:0.7; metalness:0.35"></a-box>
+  <a-box position="0 4.0  2"   width="14" height="0.15" depth="0.22" material="color:#281808; roughness:0.7; metalness:0.35"></a-box>
 
   <!-- ===================== ОСВІТЛЕННЯ ===================== -->
-  <a-light type="ambient" color="#2a1206" intensity="0.55"></a-light>
-
-  <!-- Газова лампа — ліва передня -->
-  <a-entity position="-4.3 3.5 3.0">
-    <a-cylinder radius="0.04" height="0.55" material="color:#8B6914; metalness:0.85; roughness:0.2"></a-cylinder>
-    <a-cone radius-bottom="0.14" radius-top="0.05" height="0.22" position="0 0.38 0" material="color:#7a5810; metalness:0.8"></a-cone>
-    <a-sphere radius="0.09" position="0 0.52 0" material="color:#ffdd66; emissive:#ff8800; emissiveIntensity:1.3; opacity:0.85; transparent:true"></a-sphere>
-    <a-light type="point" color="#ff7010" intensity="1.5" distance="7" position="0 0.52 0"></a-light>
-    <!-- Кронштейн -->
-    <a-box width="0.04" height="0.04" depth="0.35" position="0 0.2 0.17" material="color:#5a3d0a; metalness:0.7"></a-box>
-  </a-entity>
-  <!-- Газова лампа — права передня -->
-  <a-entity position="4.3 3.5 3.0">
-    <a-cylinder radius="0.04" height="0.55" material="color:#8B6914; metalness:0.85; roughness:0.2"></a-cylinder>
-    <a-cone radius-bottom="0.14" radius-top="0.05" height="0.22" position="0 0.38 0" material="color:#7a5810; metalness:0.8"></a-cone>
-    <a-sphere radius="0.09" position="0 0.52 0" material="color:#ffdd66; emissive:#ff8800; emissiveIntensity:1.3; opacity:0.85; transparent:true"></a-sphere>
-    <a-light type="point" color="#ff7010" intensity="1.5" distance="7" position="0 0.52 0"></a-light>
-    <a-box width="0.04" height="0.04" depth="0.35" position="0 0.2 0.17" material="color:#5a3d0a; metalness:0.7"></a-box>
-  </a-entity>
-  <!-- Газова лампа — ліва задня -->
-  <a-entity position="-4.3 3.5 -4.0">
-    <a-cylinder radius="0.04" height="0.55" material="color:#8B6914; metalness:0.85; roughness:0.2"></a-cylinder>
-    <a-cone radius-bottom="0.14" radius-top="0.05" height="0.22" position="0 0.38 0" material="color:#7a5810; metalness:0.8"></a-cone>
-    <a-sphere radius="0.09" position="0 0.52 0" material="color:#ffdd66; emissive:#ff8800; emissiveIntensity:1.3; opacity:0.85; transparent:true"></a-sphere>
-    <a-light type="point" color="#ff7010" intensity="1.3" distance="7" position="0 0.52 0"></a-light>
-  </a-entity>
-  <!-- Газова лампа — права задня -->
-  <a-entity position="4.3 3.5 -4.0">
-    <a-cylinder radius="0.04" height="0.55" material="color:#8B6914; metalness:0.85; roughness:0.2"></a-cylinder>
-    <a-cone radius-bottom="0.14" radius-top="0.05" height="0.22" position="0 0.38 0" material="color:#7a5810; metalness:0.8"></a-cone>
-    <a-sphere radius="0.09" position="0 0.52 0" material="color:#ffdd66; emissive:#ff8800; emissiveIntensity:1.3; opacity:0.85; transparent:true"></a-sphere>
-    <a-light type="point" color="#ff7010" intensity="1.3" distance="7" position="0 0.52 0"></a-light>
-  </a-entity>
+  <a-light type="ambient" color="#6a3a18" intensity="1.2"></a-light>
+  <a-light type="directional" position="0 3 5" color="#ffeecc" intensity="0.65"></a-light>
 
   <!-- Підвісний ліхтар над столом -->
-  <a-entity position="0 3.95 0">
-    <a-cylinder radius="0.012" height="0.55" material="color:#4a3008; metalness:0.75"></a-cylinder>
-    <a-cylinder radius="0.2" height="0.25" position="0 -0.4 0" material="color:#8B6914; metalness:0.88; roughness:0.15"></a-cylinder>
-    <a-cone radius-bottom="0.2" radius-top="0.06" height="0.2" position="0 -0.62 0" rotation="180 0 0" material="color:#7a5810; metalness:0.8"></a-cone>
-    <a-sphere radius="0.11" position="0 -0.4 0" material="color:#fff8cc; emissive:#ffcc33; emissiveIntensity:1.6; opacity:0.88; transparent:true"></a-sphere>
-    <a-light type="point" color="#ffaa20" intensity="2.2" distance="5.5" position="0 -0.4 0"></a-light>
-    <!-- Декоративне кільце -->
-    <a-torus radius="0.21" radius-tubular="0.012" position="0 -0.28 0" material="color:#b87333; metalness:0.9"></a-torus>
+  <a-entity position="0 4.0 0">
+    <a-cylinder radius="0.013" height="0.62" material="color:#4a3008; metalness:0.75"></a-cylinder>
+    <a-cylinder radius="0.24" height="0.3" position="0 -0.46 0" material="color:#9e7422; metalness:0.88; roughness:0.15"></a-cylinder>
+    <a-cone radius-bottom="0.24" radius-top="0.07" height="0.22" position="0 -0.68 0" rotation="180 0 0" material="color:#7e5c12; metalness:0.8"></a-cone>
+    <a-sphere radius="0.14" position="0 -0.46 0" material="color:#fffccc; emissive:#ffee44; emissiveIntensity:2.2; opacity:0.92; transparent:true"></a-sphere>
+    <a-light type="point" color="#ffdd30" intensity="3.5" distance="8" position="0 -0.46 0"></a-light>
+    <a-torus radius="0.25" radius-tubular="0.015" position="0 -0.32 0" material="color:#d49040; metalness:0.92"></a-torus>
+  </a-entity>
+
+  <!-- Ліхтар ЛП -->
+  <a-entity position="-4.5 3.35 2.8">
+    <a-cylinder radius="0.044" height="0.54" material="color:#9e7422; metalness:0.85; roughness:0.2"></a-cylinder>
+    <a-cone radius-bottom="0.16" radius-top="0.055" height="0.22" position="0 0.38 0" material="color:#7e5c12; metalness:0.8"></a-cone>
+    <a-sphere radius="0.11" position="0 0.52 0" material="color:#ffe8aa; emissive:#ffbb22; emissiveIntensity:2.0; opacity:0.9; transparent:true"></a-sphere>
+    <a-light type="point" color="#ff9020" intensity="2.5" distance="9" position="0 0.52 0"></a-light>
+  </a-entity>
+  <!-- Ліхтар ПП -->
+  <a-entity position="4.5 3.35 2.8">
+    <a-cylinder radius="0.044" height="0.54" material="color:#9e7422; metalness:0.85; roughness:0.2"></a-cylinder>
+    <a-cone radius-bottom="0.16" radius-top="0.055" height="0.22" position="0 0.38 0" material="color:#7e5c12; metalness:0.8"></a-cone>
+    <a-sphere radius="0.11" position="0 0.52 0" material="color:#ffe8aa; emissive:#ffbb22; emissiveIntensity:2.0; opacity:0.9; transparent:true"></a-sphere>
+    <a-light type="point" color="#ff9020" intensity="2.5" distance="9" position="0 0.52 0"></a-light>
+  </a-entity>
+  <!-- Ліхтар ЛЗ -->
+  <a-entity position="-4.5 3.35 -3.8">
+    <a-cylinder radius="0.044" height="0.54" material="color:#9e7422; metalness:0.85; roughness:0.2"></a-cylinder>
+    <a-cone radius-bottom="0.16" radius-top="0.055" height="0.22" position="0 0.38 0" material="color:#7e5c12; metalness:0.8"></a-cone>
+    <a-sphere radius="0.11" position="0 0.52 0" material="color:#ffe8aa; emissive:#ffbb22; emissiveIntensity:2.0; opacity:0.9; transparent:true"></a-sphere>
+    <a-light type="point" color="#ff9020" intensity="2.2" distance="9" position="0 0.52 0"></a-light>
+  </a-entity>
+  <!-- Ліхтар ПЗ -->
+  <a-entity position="4.5 3.35 -3.8">
+    <a-cylinder radius="0.044" height="0.54" material="color:#9e7422; metalness:0.85; roughness:0.2"></a-cylinder>
+    <a-cone radius-bottom="0.16" radius-top="0.055" height="0.22" position="0 0.38 0" material="color:#7e5c12; metalness:0.8"></a-cone>
+    <a-sphere radius="0.11" position="0 0.52 0" material="color:#ffe8aa; emissive:#ffbb22; emissiveIntensity:2.0; opacity:0.9; transparent:true"></a-sphere>
+    <a-light type="point" color="#ff9020" intensity="2.2" distance="9" position="0 0.52 0"></a-light>
   </a-entity>
 
   <!-- ===================== ШЕСТЕРНІ ===================== -->
-
-  <!-- Велика шестерня — ліва стіна -->
-  <a-entity position="-4.98 2.4 -1.8" rotation="0 90 0">
-    <a-entity animation="property:rotation; from:0 0 0; to:0 0 360; dur:20000; loop:true; easing:linear">
-      <a-torus radius="1.0" radius-tubular="0.075" segments-radial="12" segments-tubular="8" material="color:#4a3008; metalness:0.85; roughness:0.2"></a-torus>
-      <a-cylinder radius="0.82" height="0.06" material="color:#3a2406; metalness:0.7; roughness:0.35; opacity:0.55; transparent:true"></a-cylinder>
-      <a-box width="1.8" height="0.09" depth:"0.09" material="color:#5a3c0a; metalness:0.75; roughness:0.3"></a-box>
-      <a-box width="1.8" height="0.09" depth="0.09" rotation="0 0 60" material="color:#5a3c0a; metalness:0.75; roughness:0.3"></a-box>
-      <a-box width="1.8" height="0.09" depth="0.09" rotation="0 0 120" material="color:#5a3c0a; metalness:0.75; roughness:0.3"></a-box>
-      <a-cylinder radius="0.16" height="0.18" material="color:#b87333; metalness:0.92; roughness:0.08"></a-cylinder>
-      <a-torus radius="0.16" radius-tubular="0.03" material="color:#8B6914; metalness:0.88"></a-torus>
+  <a-entity position="-5.12 2.4 -1.8" rotation="0 90 0">
+    <a-entity animation="property:rotation; from:0 0 0; to:0 0 360; dur:18000; loop:true; easing:linear">
+      <a-torus radius="1.05" radius-tubular="0.082" segments-radial="12" segments-tubular="8" material="color:#6a4a10; metalness:0.9; roughness:0.15"></a-torus>
+      <a-box width="1.9" height="0.1" depth="0.1" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-box width="1.9" height="0.1" depth="0.1" rotation="0 0 60" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-box width="1.9" height="0.1" depth="0.1" rotation="0 0 120" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-cylinder radius="0.18" height="0.2" material="color:#d49040; metalness:0.96; roughness:0.06"></a-cylinder>
     </a-entity>
   </a-entity>
-
-  <!-- Середня шестерня — ліва стіна (зачеплена з великою) -->
-  <a-entity position="-4.98 3.62 -1.8" rotation="0 90 0">
-    <a-entity animation="property:rotation; from:0 0 0; to:0 0 -360; dur:8000; loop:true; easing:linear">
-      <a-torus radius="0.52" radius-tubular:"0.06" radius-tubular="0.06" segments-radial="10" segments-tubular="8" material="color:#6a4a10; metalness:0.85; roughness:0.2"></a-torus>
-      <a-box width="0.9" height="0.08" depth="0.08" material="color:#7a5a14; metalness:0.75"></a-box>
-      <a-box width="0.9" height="0.08" depth="0.08" rotation="0 0 90" material="color:#7a5a14; metalness:0.75"></a-box>
-      <a-cylinder radius="0.09" height:"0.14" radius="0.09" height="0.14" material="color:#b87333; metalness:0.92"></a-cylinder>
+  <a-entity position="-5.12 3.72 -1.8" rotation="0 90 0">
+    <a-entity animation="property:rotation; from:0 0 0; to:0 0 -360; dur:7500; loop:true; easing:linear">
+      <a-torus radius="0.55" radius-tubular="0.065" segments-radial="10" segments-tubular="8" material="color:#7a5a14; metalness:0.9; roughness:0.15"></a-torus>
+      <a-box width="0.96" height="0.09" depth="0.09" material="color:#8a6a18; metalness:0.8"></a-box>
+      <a-box width="0.96" height="0.09" depth="0.09" rotation="0 0 90" material="color:#8a6a18; metalness:0.8"></a-box>
+      <a-cylinder radius="0.1" height="0.15" material="color:#d49040; metalness:0.96"></a-cylinder>
     </a-entity>
   </a-entity>
-
-  <!-- Шестерня — права стіна -->
-  <a-entity position="4.98 2.6 0.8" rotation="0 -90 0">
-    <a-entity animation="property:rotation; from:0 0 0; to:0 0 360; dur:25000; loop:true; easing:linear">
-      <a-torus radius="0.75" radius-tubular="0.065" segments-radial="10" segments-tubular="8" material="color:#4a3008; metalness:0.85; roughness:0.22"></a-torus>
-      <a-box width="1.35" height="0.08" depth="0.08" material="color:#5a3c0a; metalness:0.75"></a-box>
-      <a-box width="1.35" height="0.08" depth="0.08" rotation="0 0 45" material="color:#5a3c0a; metalness:0.75"></a-box>
-      <a-box width="1.35" height="0.08" depth="0.08" rotation="0 0 90" material="color:#5a3c0a; metalness:0.75"></a-box>
-      <a-box width="1.35" height="0.08" depth="0.08" rotation="0 0 135" material="color:#5a3c0a; metalness:0.75"></a-box>
-      <a-cylinder radius="0.12" height="0.15" material="color:#b87333; metalness:0.92"></a-cylinder>
+  <a-entity position="5.12 2.6 0.8" rotation="0 -90 0">
+    <a-entity animation="property:rotation; from:0 0 0; to:0 0 360; dur:24000; loop:true; easing:linear">
+      <a-torus radius="0.8" radius-tubular="0.07" segments-radial="10" segments-tubular="8" material="color:#6a4a10; metalness:0.9; roughness:0.18"></a-torus>
+      <a-box width="1.45" height="0.09" depth="0.09" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-box width="1.45" height="0.09" depth="0.09" rotation="0 0 45" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-box width="1.45" height="0.09" depth="0.09" rotation="0 0 90" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-box width="1.45" height="0.09" depth="0.09" rotation="0 0 135" material="color:#7a5a12; metalness:0.8"></a-box>
+      <a-cylinder radius="0.14" height="0.17" material="color:#d49040; metalness:0.96"></a-cylinder>
     </a-entity>
   </a-entity>
 
   <!-- ===================== ТРУБИ ===================== -->
-  <!-- Головна поперечна -->
-  <a-cylinder position="0 3.78 -2.8" radius="0.075" height="11" rotation="0 0 90" material="color:#352010; metalness:0.65; roughness:0.45"></a-cylinder>
-  <!-- Хомути -->
-  <a-torus position="-4 3.78 -2.8" radius="0.11" radius-tubular:"0.022" radius-tubular="0.022" rotation="0 0 90" material="color:#b87333; metalness:0.88"></a-torus>
-  <a-torus position=" 0 3.78 -2.8" radius="0.11" radius-tubular="0.022" rotation="0 0 90" material="color:#b87333; metalness:0.88"></a-torus>
-  <a-torus position=" 4 3.78 -2.8" radius="0.11" radius-tubular="0.022" rotation="0 0 90" material="color:#b87333; metalness:0.88"></a-torus>
-  <!-- Вертикальні відводи -->
-  <a-cylinder position="-4 3.38 -2.8" radius="0.055" height="0.8" material="color:#352010; metalness:0.65; roughness:0.45"></a-cylinder>
-  <a-cylinder position=" 4 3.38 -2.8" radius="0.055" height="0.8" material="color:#352010; metalness:0.65; roughness:0.45"></a-cylinder>
-  <!-- Бокова труба зліва -->
-  <a-cylinder position="-4.6 3.62 0" radius="0.055" height="11" rotation="0 90 0" material="color:#2e1e08; metalness:0.6; roughness:0.5"></a-cylinder>
-  <a-torus position="-4.6 3.62 -4" radius="0.088" radius-tubular="0.02" rotation="90 0 0" material="color:#b87333; metalness:0.88"></a-torus>
-  <a-torus position="-4.6 3.62  2" radius="0.088" radius-tubular="0.02" rotation="90 0 0" material="color:#b87333; metalness:0.88"></a-torus>
-
-  <!-- ===================== ПАР З ТРУБ ===================== -->
-  <a-entity position="-4.0 3.18 -2.8">
-    <a-sphere radius="0.06" material="color:#ccccbb; opacity:0; transparent:true"
-      animation__p="property:position; from:0 0 0; to:0.1 0.9 0; dur:2800; loop:true; easing:easeOutQuad; delay:0"
-      animation__o="property:material.opacity; from:0.35; to:0; dur:2800; loop:true; easing:easeOutQuad"
-      animation__s="property:scale; from:1 1 1; to:2.5 2.5 2.5; dur:2800; loop:true; easing:easeOutQuad"></a-sphere>
+  <a-cylinder position="0 3.82 -2.8" radius="0.08" height="12" rotation="0 0 90" material="color:#3a2410; metalness:0.65; roughness:0.45"></a-cylinder>
+  <a-torus position="-4.2 3.82 -2.8" radius="0.12" radius-tubular="0.024" rotation="0 0 90" material="color:#d49040; metalness:0.9"></a-torus>
+  <a-torus position=" 0   3.82 -2.8" radius="0.12" radius-tubular="0.024" rotation="0 0 90" material="color:#d49040; metalness:0.9"></a-torus>
+  <a-torus position=" 4.2 3.82 -2.8" radius="0.12" radius-tubular="0.024" rotation="0 0 90" material="color:#d49040; metalness:0.9"></a-torus>
+  <a-cylinder position="-4.2 3.42 -2.8" radius="0.058" height="0.82" material="color:#3a2410; metalness:0.65; roughness:0.45"></a-cylinder>
+  <a-cylinder position=" 4.2 3.42 -2.8" radius="0.058" height="0.82" material="color:#3a2410; metalness:0.65; roughness:0.45"></a-cylinder>
+  <a-cylinder position="-4.65 3.66 0" radius="0.058" height="12" rotation="0 90 0" material="color:#2e1e08; metalness:0.6; roughness:0.5"></a-cylinder>
+  <!-- Пар -->
+  <a-entity position="-4.2 3.02 -2.8">
+    <a-sphere radius="0.065" material="color:#ddd8cc; opacity:0; transparent:true"
+      animation__p="property:position; from:0 0 0; to:0.12 1.0 0; dur:2600; loop:true; easing:easeOutQuad"
+      animation__o="property:material.opacity; from:0.45; to:0; dur:2600; loop:true; easing:easeOutQuad"
+      animation__s="property:scale; from:1 1 1; to:3 3 3; dur:2600; loop:true; easing:easeOutQuad"></a-sphere>
   </a-entity>
-  <a-entity position="4.0 3.18 -2.8">
-    <a-sphere radius="0.06" material="color:#ccccbb; opacity:0; transparent:true"
-      animation__p="property:position; from:0 0 0; to:-0.1 0.9 0; dur:3200; loop:true; easing:easeOutQuad; delay:600"
-      animation__o="property:material.opacity; from:0.3; to:0; dur:3200; loop:true; easing:easeOutQuad; delay:600"
-      animation__s="property:scale; from:1 1 1; to:2.8 2.8 2.8; dur:3200; loop:true; easing:easeOutQuad; delay:600"></a-sphere>
+  <a-entity position="4.2 3.02 -2.8">
+    <a-sphere radius="0.065" material="color:#ddd8cc; opacity:0; transparent:true"
+      animation__p="property:position; from:0 0 0; to:-0.12 1.0 0; dur:3000; loop:true; easing:easeOutQuad; delay:700"
+      animation__o="property:material.opacity; from:0.4; to:0; dur:3000; loop:true; easing:easeOutQuad; delay:700"
+      animation__s="property:scale; from:1 1 1; to:3 3 3; dur:3000; loop:true; easing:easeOutQuad; delay:700"></a-sphere>
   </a-entity>
 
-  <!-- ===================== ЦЕНТРАЛЬНИЙ СТІЛ ===================== -->
-  <!-- Стільниця -->
-  <a-box position="0 1.02 0" width="2.9" height="0.1" depth="1.55" material="color:#251005; roughness:0.9; metalness:0.03"></a-box>
-  <!-- Латунна окантовка -->
-  <a-box position="0 1.076 0" width="2.94" height="0.016" depth="1.59" material="color:#b87333; metalness:0.9; roughness:0.12"></a-box>
-  <!-- Бічні накладки -->
-  <a-box position="0 1.02 -0.78" width="2.9" height="0.1" depth="0.02" material="color:#b87333; metalness:0.8; roughness:0.2"></a-box>
-  <a-box position="0 1.02  0.78" width="2.9" height="0.1" depth="0.02" material="color:#b87333; metalness:0.8; roughness:0.2"></a-box>
-  <a-box position="-1.46 1.02 0" width="0.02" height="0.1" depth="1.59" material="color:#b87333; metalness:0.8; roughness:0.2"></a-box>
-  <a-box position=" 1.46 1.02 0" width="0.02" height="0.1" depth="1.59" material="color:#b87333; metalness:0.8; roughness:0.2"></a-box>
-  <!-- Ніжки -->
-  <a-entity position="-1.25 0.51 -0.65">
-    <a-cylinder radius="0.055" height="1.02" material="color:#3a1a06; roughness:0.85; metalness:0.1"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0 -0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0  0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-  </a-entity>
-  <a-entity position=" 1.25 0.51 -0.65">
-    <a-cylinder radius="0.055" height="1.02" material="color:#3a1a06; roughness:0.85; metalness:0.1"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0 -0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0  0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-  </a-entity>
-  <a-entity position="-1.25 0.51  0.65">
-    <a-cylinder radius="0.055" height="1.02" material="color:#3a1a06; roughness:0.85; metalness:0.1"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0 -0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0  0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-  </a-entity>
-  <a-entity position=" 1.25 0.51  0.65">
-    <a-cylinder radius="0.055" height="1.02" material="color:#3a1a06; roughness:0.85; metalness:0.1"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0 -0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-    <a-cylinder radius="0.075" height="0.06" position="0  0.51 0" material="color:#b87333; metalness:0.82"></a-cylinder>
-  </a-entity>
-  <!-- Перемички -->
-  <a-box position="0 0.38 -0.65" width="2.5" height="0.06" depth="0.06" material="color:#3a1a06; roughness:0.85"></a-box>
-  <a-box position="0 0.38  0.65" width="2.5" height="0.06" depth="0.06" material="color:#3a1a06; roughness:0.85"></a-box>
+  <!-- ===================== СТІЛ ===================== -->
+  <a-box position="0 1.04 0" width="3.0" height="0.11" depth="1.6" material="color:#381608; roughness:0.88"></a-box>
+  <a-box position="0 1.1 0" width="3.04" height="0.018" depth="1.64" material="color:#d49040; metalness:0.92; roughness:0.1"></a-box>
+  <a-box position="0 1.04 -0.81" width="3.0" height="0.11" depth="0.022" material="color:#d49040; metalness:0.82"></a-box>
+  <a-box position="0 1.04  0.81" width="3.0" height="0.11" depth="0.022" material="color:#d49040; metalness:0.82"></a-box>
+  <a-box position="-1.51 1.04 0" width="0.022" height="0.11" depth="1.64" material="color:#d49040; metalness:0.82"></a-box>
+  <a-box position=" 1.51 1.04 0" width="0.022" height="0.11" depth="1.64" material="color:#d49040; metalness:0.82"></a-box>
+  <a-entity position="-1.3 0.52 -0.68"><a-cylinder radius="0.058" height="1.04" material="color:#3a1a06; roughness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 -0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder></a-entity>
+  <a-entity position=" 1.3 0.52 -0.68"><a-cylinder radius="0.058" height="1.04" material="color:#3a1a06; roughness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 -0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder></a-entity>
+  <a-entity position="-1.3 0.52  0.68"><a-cylinder radius="0.058" height="1.04" material="color:#3a1a06; roughness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 -0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder></a-entity>
+  <a-entity position=" 1.3 0.52  0.68"><a-cylinder radius="0.058" height="1.04" material="color:#3a1a06; roughness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 -0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder><a-cylinder radius="0.08" height="0.065" position="0 0.52 0" material="color:#d49040; metalness:0.85"></a-cylinder></a-entity>
+  <a-box position="0 0.39 -0.68" width="2.6" height="0.065" depth="0.065" material="color:#3a1a06; roughness:0.85"></a-box>
+  <a-box position="0 0.39  0.68" width="2.6" height="0.065" depth="0.065" material="color:#3a1a06; roughness:0.85"></a-box>
 
   <!-- ===================== КНИЖКОВА ПОЛИЦЯ ===================== -->
-  <!-- Каркас -->
-  <a-box position="-2.8 1.6 -5.04" width="2.4" height="2.8" depth="0.12" material="color:#231005; roughness:0.9"></a-box>
-  <!-- Латунні ребра -->
-  <a-box position="-2.8 0.3 -4.97" width="2.38" height="0.035" depth="0.32" material="color:#b87333; metalness:0.78; roughness:0.25"></a-box>
-  <a-box position="-2.8 0.85 -4.97" width="2.38" height="0.035" depth="0.32" material="color:#b87333; metalness:0.78; roughness:0.25"></a-box>
-  <a-box position="-2.8 1.42 -4.97" width="2.38" height="0.035" depth="0.32" material="color:#b87333; metalness:0.78; roughness:0.25"></a-box>
-  <a-box position="-2.8 1.98 -4.97" width="2.38" height="0.035" depth="0.32" material="color:#b87333; metalness:0.78; roughness:0.25"></a-box>
-  <a-box position="-2.8 2.55 -4.97" width="2.38" height="0.035" depth="0.32" material="color:#b87333; metalness:0.78; roughness:0.25"></a-box>
-  <!-- Книги (ряди) -->
-  <a-box position="-3.62 0.58 -4.82" width="0.13" height="0.43" depth="0.24" material="color:#581515; roughness:0.9"></a-box>
-  <a-box position="-3.47 0.58 -4.82" width="0.11" height="0.43" depth="0.24" material="color:#15305a; roughness:0.9"></a-box>
-  <a-box position="-3.34 0.58 -4.82" width="0.14" height="0.43" depth="0.24" material="color:#2a5a1a; roughness:0.9"></a-box>
-  <a-box position="-3.17 0.58 -4.82" width="0.11" height="0.43" depth="0.24" material="color:#5a4510; roughness:0.9"></a-box>
-  <a-box position="-3.03 0.58 -4.82" width="0.13" height="0.43" depth="0.24" material="color:#3a105a; roughness:0.9"></a-box>
-  <a-box position="-2.87 0.58 -4.82" width="0.10" height="0.43" depth="0.24" material="color:#5a2010; roughness:0.9"></a-box>
-  <a-box position="-2.74 0.58 -4.82" width="0.14" height="0.43" depth="0.24" material="color:#1a4a3a; roughness:0.9"></a-box>
-  <a-box position="-2.57 0.58 -4.82" width="0.11" height="0.43" depth="0.24" material="color:#4a3510; roughness:0.9"></a-box>
-  <a-box position="-2.43 0.58 -4.82" width="0.12" height="0.43" depth="0.24" material="color:#5a1a30; roughness:0.9"></a-box>
-  <a-box position="-2.28 0.58 -4.82" width="0.13" height="0.43" depth="0.24" material="color:#15405a; roughness:0.9"></a-box>
-  <a-box position="-2.12 0.58 -4.82" width="0.11" height="0.43" depth="0.24" material="color:#3a5a20; roughness:0.9"></a-box>
-  <!-- 2 ряд -->
-  <a-box position="-3.60 1.15 -4.82" width="0.12" height="0.43" depth="0.24" material="color:#3a2010; roughness:0.9"></a-box>
-  <a-box position="-3.45 1.15 -4.82" width="0.13" height="0.43" depth="0.24" material="color:#5a0f1f; roughness:0.9"></a-box>
-  <a-box position="-3.29 1.15 -4.82" width="0.14" height="0.43" depth="0.24" material="color:#1a4a5a; roughness:0.9"></a-box>
-  <a-box position="-3.12 1.15 -4.82" width="0.10" height="0.43" depth="0.24" material="color:#5a3510; roughness:0.9"></a-box>
-  <a-box position="-2.99 1.15 -4.82" width="0.12" height="0.43" depth="0.24" material="color:#2a5a1a; roughness:0.9"></a-box>
-  <a-box position="-2.84 1.15 -4.82" width="0.11" height="0.43" depth="0.24" material="color:#3a1a4a; roughness:0.9"></a-box>
-  <a-box position="-2.70 1.15 -4.82" width="0.13" height="0.43" depth="0.24" material="color:#4a1510; roughness:0.9"></a-box>
-  <a-box position="-2.54 1.15 -4.82" width="0.14" height="0.43" depth="0.24" material="color:#154a4a; roughness:0.9"></a-box>
-  <a-box position="-2.37 1.15 -4.82" width="0.11" height="0.43" depth="0.24" material="color:#5a4a10; roughness:0.9"></a-box>
+  <a-box position="-2.9 1.6 -5.12" width="2.5" height="2.9" depth="0.14" material="color:#2e1606; roughness:0.9"></a-box>
+  <a-box position="-2.9 0.32 -5.05" width="2.48" height="0.04" depth="0.34" material="color:#d49040; metalness:0.8; roughness:0.22"></a-box>
+  <a-box position="-2.9 0.88 -5.05" width="2.48" height="0.04" depth="0.34" material="color:#d49040; metalness:0.8; roughness:0.22"></a-box>
+  <a-box position="-2.9 1.45 -5.05" width="2.48" height="0.04" depth="0.34" material="color:#d49040; metalness:0.8; roughness:0.22"></a-box>
+  <a-box position="-2.9 2.02 -5.05" width="2.48" height="0.04" depth="0.34" material="color:#d49040; metalness:0.8; roughness:0.22"></a-box>
+  <a-box position="-2.9 2.60 -5.05" width="2.48" height="0.04" depth="0.34" material="color:#d49040; metalness:0.8; roughness:0.22"></a-box>
+  <a-box position="-3.72 0.60 -4.9" width="0.14" height="0.44" depth="0.26" material="color:#6e1c1c; roughness:0.9"></a-box>
+  <a-box position="-3.56 0.60 -4.9" width="0.12" height="0.44" depth="0.26" material="color:#1c3e6e; roughness:0.9"></a-box>
+  <a-box position="-3.42 0.60 -4.9" width="0.15" height="0.44" depth="0.26" material="color:#2c6e1c; roughness:0.9"></a-box>
+  <a-box position="-3.25 0.60 -4.9" width="0.12" height="0.44" depth="0.26" material="color:#6e5514; roughness:0.9"></a-box>
+  <a-box position="-3.10 0.60 -4.9" width="0.14" height="0.44" depth="0.26" material="color:#42146e; roughness:0.9"></a-box>
+  <a-box position="-2.93 0.60 -4.9" width="0.11" height="0.44" depth="0.26" material="color:#6e2614; roughness:0.9"></a-box>
+  <a-box position="-2.79 0.60 -4.9" width="0.15" height="0.44" depth="0.26" material="color:#1c5a44; roughness:0.9"></a-box>
+  <a-box position="-2.61 0.60 -4.9" width="0.12" height="0.44" depth="0.26" material="color:#4c4216; roughness:0.9"></a-box>
+  <a-box position="-2.46 0.60 -4.9" width="0.13" height="0.44" depth="0.26" material="color:#6e1c3a; roughness:0.9"></a-box>
+  <a-box position="-2.30 0.60 -4.9" width="0.14" height="0.44" depth="0.26" material="color:#1c4a6e; roughness:0.9"></a-box>
+  <a-box position="-2.13 0.60 -4.9" width="0.12" height="0.44" depth="0.26" material="color:#3c6e26; roughness:0.9"></a-box>
+  <a-box position="-3.70 1.17 -4.9" width="0.13" height="0.44" depth="0.26" material="color:#3c2416; roughness:0.9"></a-box>
+  <a-box position="-3.55 1.17 -4.9" width="0.14" height="0.44" depth="0.26" material="color:#6e1222; roughness:0.9"></a-box>
+  <a-box position="-3.39 1.17 -4.9" width="0.15" height="0.44" depth="0.26" material="color:#1c4c6e; roughness:0.9"></a-box>
+  <a-box position="-3.22 1.17 -4.9" width="0.11" height="0.44" depth="0.26" material="color:#6e4216; roughness:0.9"></a-box>
+  <a-box position="-3.08 1.17 -4.9" width="0.13" height="0.44" depth="0.26" material="color:#2c6e1c; roughness:0.9"></a-box>
+  <a-box position="-2.92 1.17 -4.9" width="0.12" height="0.44" depth="0.26" material="color:#3c1c5c; roughness:0.9"></a-box>
+  <a-box position="-2.77 1.17 -4.9" width="0.14" height="0.44" depth="0.26" material="color:#4c1c16; roughness:0.9"></a-box>
+  <a-box position="-2.60 1.17 -4.9" width="0.15" height="0.44" depth="0.26" material="color:#165458; roughness:0.9"></a-box>
+  <a-box position="-2.42 1.17 -4.9" width="0.12" height="0.44" depth="0.26" material="color:#6e5616; roughness:0.9"></a-box>
 
-  <!-- ===================== МАНОМЕТР (декор) ===================== -->
-  <a-entity position="1.8 2.3 -5.0">
-    <a-cylinder radius="0.24" height="0.06" material="color:#5a3d0a; metalness:0.82; roughness:0.22"></a-cylinder>
-    <a-circle radius="0.2" position="0 0.04 0" material="color:#e8e2c8; opacity:0.97"></a-circle>
-    <a-box width="0.005" height="0.13" depth="0.005" position="0 0.07 0" rotation="0 0 -45" material="color:#cc2200; emissive:#aa1100; emissiveIntensity:0.4"></a-box>
-    <a-cylinder radius="0.028" height="0.04" position="0 0.04 0" material="color:#b87333; metalness:0.92"></a-cylinder>
-    <a-torus radius="0.24" radius-tubular="0.016" material="color:#b87333; metalness:0.9; roughness:0.12"></a-torus>
-    <a-box width="0.004" height="0.08" depth="0.004" position="0 0.18 0" material="color:#333322"></a-box>
-    <a-box width="0.004" height="0.06" depth="0.004" position="0.18 0 0" rotation="0 0 -90" material="color:#333322"></a-box>
-    <a-box width="0.004" height="0.06" depth="0.004" position="-0.18 0 0" rotation="0 0 90" material="color:#333322"></a-box>
-    <!-- Трубка до манометра -->
-    <a-cylinder radius="0.025" height="0.6" position="0.15 -0.38 0" rotation="0 0 25" material="color:#352010; metalness:0.65"></a-cylinder>
+  <!-- ===================== МАНОМЕТР ===================== -->
+  <a-entity position="1.9 2.35 -5.1">
+    <a-cylinder radius="0.26" height="0.065" material="color:#6e4e0c; metalness:0.84; roughness:0.2"></a-cylinder>
+    <a-circle radius="0.22" position="0 0.04 0" material="color:#f2ecce; opacity:0.97"></a-circle>
+    <a-box width="0.006" height="0.14" depth="0.006" position="0 0.08 0" rotation="0 0 -42" material="color:#dd2200; emissive:#cc1100; emissiveIntensity:0.6"></a-box>
+    <a-cylinder radius="0.03" height="0.045" position="0 0.04 0" material="color:#d49040; metalness:0.94"></a-cylinder>
+    <a-torus radius="0.26" radius-tubular="0.018" material="color:#d49040; metalness:0.92; roughness:0.1"></a-torus>
+    <a-box width="0.005" height="0.09" depth="0.005" position="0 0.21 0" material="color:#443322"></a-box>
+    <a-box width="0.005" height="0.07" depth="0.005" position="0.2 0 0" rotation="0 0 -90" material="color:#443322"></a-box>
+    <a-box width="0.005" height="0.07" depth="0.005" position="-0.2 0 0" rotation="0 0 90" material="color:#443322"></a-box>
+    <a-cylinder radius="0.027" height="0.65" position="0.17 -0.4 0" rotation="0 0 22" material="color:#3a2010; metalness:0.68"></a-cylinder>
   </a-entity>
 
   <!-- ===================== ПОЛИЦЯ З ПРИЛАДАМИ ===================== -->
-  <a-entity position="4.58 1.55 -3.2" rotation="0 -90 0">
-    <a-box width="1.2" height="0.05" depth="0.32" material="color:#3a1a06; roughness:0.85"></a-box>
-    <a-box width="0.05" height="0.05" depth="0.32" position="-0.6 -0.35 0" material="color:#b87333; metalness:0.7"></a-box>
-    <a-box width="0.05" height="0.05" depth="0.32" position=" 0.6 -0.35 0" material="color:#b87333; metalness:0.7"></a-box>
-    <a-box width="1.2" height="0.5" depth="0.04" position="0 -0.28 0.14" material="color:#251005; roughness:0.9"></a-box>
-    <!-- Колба з рідиною -->
-    <a-sphere radius="0.11" position="-0.35 0.18 0" material="color:#88aacc; opacity:0.45; transparent:true; metalness:0.1"></a-sphere>
-    <a-sphere radius="0.07" position="-0.35 0.12 0" material="color:#cc3300; emissive:#aa2200; emissiveIntensity:0.35; opacity:0.85; transparent:true"></a-sphere>
-    <!-- Термометр -->
-    <a-cylinder radius="0.025" height="0.45" position="0 0.25 0" material="color:#88aacc; opacity:0.6; transparent:true"></a-cylinder>
-    <a-cylinder radius="0.015" height="0.3" position="0 0.22 0" material="color:#cc2200; emissive:#aa1100; emissiveIntensity:0.3"></a-cylinder>
-    <a-sphere radius="0.04" position="0 0.02 0" material="color:#cc2200; emissive:#aa1100; emissiveIntensity:0.4"></a-sphere>
-    <!-- Ваги -->
-    <a-cylinder radius="0.015" height="0.25" position="0.4 0.12 0" material="color:#b87333; metalness:0.85"></a-cylinder>
-    <a-box width="0.3" height="0.008" depth="0.008" position="0.4 0.25 0" material="color:#b87333; metalness:0.85"></a-box>
-    <a-cylinder radius="0.07" height="0.015" position="0.26 0.2 0" material="color:#8B6914; metalness:0.75"></a-cylinder>
-    <a-cylinder radius="0.07" height="0.015" position="0.54 0.22 0" material="color:#8B6914; metalness:0.75"></a-cylinder>
+  <a-entity position="4.62 1.55 -3.2" rotation="0 -90 0">
+    <a-box width="1.3" height="0.055" depth="0.34" material="color:#3c1c08; roughness:0.85"></a-box>
+    <a-box width="0.055" height="0.04" depth="0.34" position="-0.65 -0.38 0" material="color:#d49040; metalness:0.72"></a-box>
+    <a-box width="0.055" height="0.04" depth="0.34" position=" 0.65 -0.38 0" material="color:#d49040; metalness:0.72"></a-box>
+    <a-sphere radius="0.12" position="-0.38 0.2 0" material="color:#88aacc; opacity:0.5; transparent:true; metalness:0.1"></a-sphere>
+    <a-sphere radius="0.075" position="-0.38 0.13 0" material="color:#dd3300; emissive:#bb2200; emissiveIntensity:0.45; opacity:0.88; transparent:true"></a-sphere>
+    <a-cylinder radius="0.027" height="0.48" position="0 0.27 0" material="color:#88aacc; opacity:0.65; transparent:true"></a-cylinder>
+    <a-cylinder radius="0.016" height="0.32" position="0 0.24 0" material="color:#cc2200; emissive:#aa1100; emissiveIntensity:0.4"></a-cylinder>
+    <a-sphere radius="0.042" position="0 0.025 0" material="color:#cc2200; emissive:#aa1100; emissiveIntensity:0.5"></a-sphere>
+    <a-cylinder radius="0.016" height="0.28" position="0.42 0.14 0" material="color:#d49040; metalness:0.88"></a-cylinder>
+    <a-box width="0.32" height="0.009" depth="0.009" position="0.42 0.28 0" material="color:#d49040; metalness:0.88"></a-box>
+    <a-cylinder radius="0.075" height="0.016" position="0.28 0.22 0" material="color:#9e7222; metalness:0.78"></a-cylinder>
+    <a-cylinder radius="0.075" height="0.016" position="0.56 0.24 0" material="color:#9e7222; metalness:0.78"></a-cylinder>
   </a-entity>
 
-  <!-- ===================== НАПИС НА ЗАДНІЙ СТІНІ ===================== -->
-  <a-text value="ФІЗИЧНА ЛАБОРАТОРІЯ" position="0 3.38 -4.98" color="#8B6914" scale="0.95 0.95 0.95" align="center"></a-text>
-  <!-- Декоративна рамка -->
-  <a-entity position="0 3.18 -4.97">
-    <a-box width="3.2" height="0.007" depth="0.015" position="0  0.28 0" material="color:#5a3d0a; metalness:0.72"></a-box>
-    <a-box width="3.2" height="0.007" depth="0.015" position="0 -0.28 0" material="color:#5a3d0a; metalness:0.72"></a-box>
-    <a-sphere radius="0.035" position="-1.6  0.28 0" material="color:#b87333; metalness:0.9"></a-sphere>
-    <a-sphere radius="0.035" position=" 1.6  0.28 0" material="color:#b87333; metalness:0.9"></a-sphere>
-    <a-sphere radius="0.035" position="-1.6 -0.28 0" material="color:#b87333; metalness:0.9"></a-sphere>
-    <a-sphere radius="0.035" position=" 1.6 -0.28 0" material="color:#b87333; metalness:0.9"></a-sphere>
+  <!-- ===================== НАПИС ===================== -->
+  <a-text value="ФІЗИЧНА ЛАБОРАТОРІЯ" position="0 3.44 -5.1" color="#d49040" scale="1.05 1.05 1.05" align="center"></a-text>
+  <a-entity position="0 3.24 -5.08">
+    <a-box width="3.5" height="0.009" depth="0.018" position="0  0.32 0" material="color:#6e4c0a; metalness:0.75"></a-box>
+    <a-box width="3.5" height="0.009" depth="0.018" position="0 -0.32 0" material="color:#6e4c0a; metalness:0.75"></a-box>
+    <a-sphere radius="0.04" position="-1.75  0.32 0" material="color:#d49040; metalness:0.92"></a-sphere>
+    <a-sphere radius="0.04" position=" 1.75  0.32 0" material="color:#d49040; metalness:0.92"></a-sphere>
+    <a-sphere radius="0.04" position="-1.75 -0.32 0" material="color:#d49040; metalness:0.92"></a-sphere>
+    <a-sphere radius="0.04" position=" 1.75 -0.32 0" material="color:#d49040; metalness:0.92"></a-sphere>
   </a-entity>
-  <a-text value="~ Оберіть клас ~" position="0 2.88 -4.97" color="#5a3d0a" scale="0.52 0.52 0.52" align="center"></a-text>
+  <a-text value="~ Оберіть клас ~" position="0 2.96 -5.08" color="#6e4c0a" scale="0.56 0.56 0.56" align="center"></a-text>
 
-  <!-- ===================== НАВІГАЦІЙНІ КОНТЕЙНЕРИ ===================== -->
+  <!-- ===================== НАВІГАЦІЯ ===================== -->
   <a-entity id="nav-0"></a-entity>
   <a-entity id="nav-1" visible="false"></a-entity>
   <a-entity id="nav-2" visible="false"></a-entity>
 
   <!-- ===================== КАМЕРА ===================== -->
-  <a-entity position="0 1.62 3.8">
+  <a-entity position="0 1.65 3.9">
     <a-camera look-controls wasd-controls fov="72">
       <a-cursor
-        color="#c87d32"
+        color="#ffcc44"
         position="0 0 -1"
-        geometry="primitive:ring; radiusInner:0.013; radiusOuter:0.02"
-        material="color:#c87d32; shader:flat"
-        animation__fusing="property:scale; startEvents:fusing; from:1 1 1; to:0.15 0.15 0.15; dur:1400"
+        geometry="primitive:ring; radiusInner:0.014; radiusOuter:0.022"
+        material="color:#ffcc44; shader:flat"
+        animation__fusing="property:scale; startEvents:fusing; from:1 1 1; to:0.15 0.15 0.15; dur:1500"
         animation__click="property:scale; startEvents:click; from:0.15 0.15 0.15; to:1 1 1; dur:120"
-        raycaster="objects:.clickable; far:10; interval:60">
+        raycaster="objects:.clickable; far:12; interval:50">
       </a-cursor>
     </a-camera>
   </a-entity>
